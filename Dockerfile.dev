@@ -11,3 +11,19 @@ RUN npm install
 COPY . .
 
 CMD [ "npm","start" ]
+
+# เราอยากจะให้ server ใน container อัพเดทตาม source code ที่เปลี่ยน แต่ถ้าไม่ build image (แบบเดิมคือเรา copy /src /public ไปมรา /app ใน container) ใหม่ไปเลยงั้นทำยังไง -> ใช้ docker volume
+#  ด้วย docker volume เราจะ set up placeholder ของ /src กับ /public ภายใน docker container -> จะไม่ได้ copy entire src public folder แล้ว ก็คือเราจะแปะ เป็น reference ไปให้ container แทน
+
+#  Local Folder            Docker Container
+#  - frontend               - app
+#       /src          <-         reference
+#       /public       <-         reference
+
+# reference ที่แปะไว้จะชี้กลับไปหา folder ใน local machine แล้วให้ access ในการเข้าถึง file + folder กับเรา คล้ายๆที่เรา map port
+
+#                                      put a bookmark on the node_modules folder | ตอนที่เรา setup binding reference file ใน docker container กับใน local ปัญหาคือเมื่อเรา setup volume นั้นเราบอกให้เอาทุกอย่างมากจาก pwd แล้วไปmapกับ app folder ใน container แต่ว่าตอนนี้ ใน local เราไม่มี node_modules เพราะฉะนั้นตอนที่เราพยายามเอาทุกอย่างไปแล้วไป map ใน app folder เราไม่มี node_modules ที่เราเก็บ dependency ทั้งหมดไว้ ดังนั้น node_modules ใน container เลยถูก overwritten สิ่งที่เราต้องทำก็คือเพิ่ม tag v แล้วประกาศให้ node_modules เป็นแค่ placeholder for the folder that is inside the container ไม่ต้องพยายาม map กัน
+#                                                       /
+# docker run -p <local-port>:<container-port> -v /app/node_modules -v $(pwd):/app <image-id>
+#                                                                       /
+#                                           map the pwd into the /app folder, pwd = print current directory | บอกให้ map volume ด้วยการเอา frontend folder บน local แล้ว map กับ(:) /app บน cotainer | : คือ map folder ใน container to folder outside container
