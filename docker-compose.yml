@@ -3,7 +3,10 @@ version: "3"
 services:
   web:
     # build: . คือต้อง assume ว่าเรามี file docker อยู่นะ
-    build: .
+    build:
+      # เพื่อบอกว่า where we want all the files and folders for this image to be pulled from | ใน case นี้เราต้องการทุกไฟล์ที่อยู่ระดับเดียวกันกับ compse มาหมด
+      context: .
+      dockerfile: Dockerfile.dev # ภายใต้ build นี้มันก็จะไปหา file docker ที่ระบุไว้ภายใต้ folder ที่อยู่ใน context
     ports:
       - "3000:3000"
     volumes:
