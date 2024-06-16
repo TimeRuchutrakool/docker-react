@@ -21,3 +21,8 @@ services:
       - /app/node_modules
       - .:/app
     command: ["npm", "run", "test"]
+
+# build แล้ว attach ดู
+# แล้วก็ลอง docker exec -t <container-id> sh ดู แล้วดู process ด้วย ps ดู จะเห็นว่ามันมี process
+# ที่เรารันจริงๆไม่ใช่ process npm run test แต่คือ process npm แล้ว npm จะดู additional arguments (run test) แล้ว npm ก็จะ startup second process ที่ run test เราจริงๆซึ่ง process นั้นแหล่ะที่รับ cpmmands over stdnin
+# ดังนั้นสาเหตุที่เราคุยกับ container ผ่าน terminal ไม่ได้เพราะตอนที่เรา attach เรา always attach to stdin of the primary process of the container(npm) 
