@@ -5,4 +5,21 @@
 # install depts                 start nginx
 # run 'npm run build' 
 
-FROM alpine
+FROM node:16-alpine as builder
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm run install
+
+COPY . .
+
+RUN npm run build
+
+# /app/build -> all the stuff we need
+
+FROM nginx
+# saying that i want to copy something from the other phase that we hust working on [copy folder build จาก phase builder ไปวางใน /nginx/html]
+COPY --from=builder /app/build /usr/share/nginx/html
+# มัน start nginx auto ละไม่ต้องใส่ command
